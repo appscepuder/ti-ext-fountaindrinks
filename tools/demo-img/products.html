@@ -1,0 +1,58 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #fff; }
+  svg { display: block; width: 400px; height: 400px; }
+</style></head>
+<body>
+<svg id="img" viewBox="0 0 400 400"></svg>
+<script>
+// Simple flat product pictures for the demo menu (no brand marks). draw(kind) fills #img.
+const cup = (h, band, lid, txt) => {
+  const top = 340 - h, w0 = 150, w1 = 110;
+  return `
+  <ellipse cx="200" cy="350" rx="110" ry="14" fill="#e8ebf0"/>
+  <path d="M${200 - w0 / 2} ${top} L${200 + w0 / 2} ${top} L${200 + w1 / 2} 340 L${200 - w1 / 2} 340 Z" fill="#fff" stroke="#c9ced8" stroke-width="4"/>
+  <path d="M${200 - w0 / 2 + 8} ${top + h * 0.3} L${200 + w0 / 2 - 8} ${top + h * 0.3} L${200 + w0 / 2 - 8 - (w0 - w1) / 2 * 0.45} ${top + h * 0.75} L${200 - w0 / 2 + 8 + (w0 - w1) / 2 * 0.45} ${top + h * 0.75} Z" fill="${band}"/>
+  <text x="200" y="${top + h * 0.57}" font-family="Helvetica, Arial" font-weight="900" font-size="${Math.min(46, h * 0.2)}" fill="#fff" text-anchor="middle">${txt}</text>
+  <rect x="${200 - w0 / 2 - 8}" y="${top - 18}" width="${w0 + 16}" height="22" rx="8" fill="${lid}"/>
+  <rect x="214" y="${top - 90}" width="12" height="80" rx="3" fill="#ff3355" transform="rotate(12 220 ${top - 20})"/>`;
+};
+const kinds = {
+  'PEPMAX-S': () => cup(150, '#111827', '#111827', 'S'),
+  'PEPMAX-M': () => cup(200, '#111827', '#111827', 'M'),
+  'PEPMAX-L': () => cup(250, '#111827', '#111827', 'L'),
+  'PEPSI-S': () => cup(150, '#2f7de1', '#2f7de1', 'S'),
+  'PEPSI-M': () => cup(200, '#2f7de1', '#2f7de1', 'M'),
+  'PEPSI-L': () => cup(250, '#2f7de1', '#2f7de1', 'L'),
+  'FREESTYLE-M': () => cup(200, '#8b5cf6', '#ff3355', 'M+'),
+  'ESPRESSO': () => `
+    <ellipse cx="200" cy="300" rx="120" ry="22" fill="#e8ebf0"/>
+    <path d="M140 200 h120 v50 a60 50 0 0 1 -120 0 z" fill="#fff" stroke="#c9ced8" stroke-width="4"/>
+    <path d="M258 215 a22 22 0 0 1 0 40" fill="none" stroke="#c9ced8" stroke-width="10"/>
+    <ellipse cx="200" cy="202" rx="58" ry="10" fill="#5b3a1e"/>`,
+  'CAPPUCCINO': () => `
+    <ellipse cx="200" cy="315" rx="140" ry="24" fill="#e8ebf0"/>
+    <path d="M120 170 h160 v70 a80 70 0 0 1 -160 0 z" fill="#fff" stroke="#c9ced8" stroke-width="4"/>
+    <path d="M278 190 a30 30 0 0 1 0 55" fill="none" stroke="#c9ced8" stroke-width="12"/>
+    <ellipse cx="200" cy="172" rx="78" ry="14" fill="#c8a27a"/>
+    <path d="M185 172 q15 -12 30 0 q-15 10 -30 0" fill="#f5ebe0"/>`,
+  'CROISSANT': () => `
+    <ellipse cx="200" cy="300" rx="140" ry="20" fill="#e8ebf0"/>
+    <path d="M80 260 Q200 90 320 260 Q290 230 260 250 Q230 180 200 175 Q170 180 140 250 Q110 230 80 260 Z" fill="#e0a548" stroke="#b9782a" stroke-width="5"/>
+    <path d="M140 250 Q200 200 260 250" fill="none" stroke="#b9782a" stroke-width="5"/>`,
+  'TOASTIE': () => `
+    <ellipse cx="200" cy="315" rx="150" ry="20" fill="#e8ebf0"/>
+    <path d="M70 290 L190 120 L190 290 Z" fill="#e7b569" stroke="#b9782a" stroke-width="5"/>
+    <path d="M210 290 L330 120 L330 290 Z" fill="#e7b569" stroke="#b9782a" stroke-width="5" transform="translate(-10 0) scale(-1 1) translate(-540 0)"/>
+    <rect x="80" y="270" width="230" height="14" fill="#ffd34d"/>`,
+  'BROWNIE': () => `
+    <ellipse cx="200" cy="310" rx="140" ry="20" fill="#e8ebf0"/>
+    <rect x="100" y="170" width="200" height="120" rx="12" fill="#4a2c17"/>
+    <rect x="100" y="170" width="200" height="30" rx="12" fill="#6b4226"/>
+    <circle cx="150" cy="235" r="8" fill="#2e1a0d"/><circle cx="210" cy="250" r="8" fill="#2e1a0d"/><circle cx="255" cy="225" r="8" fill="#2e1a0d"/>`,
+};
+window.draw = k => { document.getElementById('img').innerHTML = kinds[k](); return Object.keys(kinds).length; };
+window.kinds = Object.keys(kinds);
+</script>
+</body></html>
