@@ -93,28 +93,34 @@ foreach ($ours as $i => $name) {
     $cat->save();
     $cats[$name] = $cat->getKey();
 }
-// ref (picture), name, price incl. VAT, category
+// ref (picture), name, price incl. VAT, category, Spire size, sugar, flavors
 $menu = [
-    ['PEPMAX-S', 'Pepsi Max Small', 2.50, 'Fountain drinks'],
-    ['PEPMAX-M', 'Pepsi Max Medium', 3.00, 'Fountain drinks'],
-    ['PEPMAX-L', 'Pepsi Max Large', 3.50, 'Fountain drinks'],
-    ['PEPSI-S', 'Pepsi Small', 2.70, 'Fountain drinks'],
-    ['PEPSI-M', 'Pepsi Medium', 3.20, 'Fountain drinks'],
-    ['PEPSI-L', 'Pepsi Large', 3.70, 'Fountain drinks'],
-    ['FREESTYLE-M', 'Any drink + flavor shot Medium', 3.60, 'Fountain drinks'],
-    ['ESPRESSO', 'Espresso', 2.40, 'Coffee'],
-    ['CAPPUCCINO', 'Cappuccino', 3.60, 'Coffee'],
-    ['CROISSANT', 'Croissant', 2.20, 'Food'],
-    ['TOASTIE', 'Ham & cheese toastie', 6.50, 'Food'],
-    ['BROWNIE', 'Chocolate brownie', 3.20, 'Food'],
+    ['PEPMAX-S', 'Pepsi Max Small', 2.50, 'Fountain drinks', 'Small', 0, 0],
+    ['PEPMAX-M', 'Pepsi Max Medium', 3.00, 'Fountain drinks', 'Medium', 0, 0],
+    ['PEPMAX-L', 'Pepsi Max Large', 3.50, 'Fountain drinks', 'Large', 0, 0],
+    ['PEPSI-S', 'Pepsi Small', 2.70, 'Fountain drinks', 'Small', 1, 0],
+    ['PEPSI-M', 'Pepsi Medium', 3.20, 'Fountain drinks', 'Medium', 1, 0],
+    ['PEPSI-L', 'Pepsi Large', 3.70, 'Fountain drinks', 'Large', 1, 0],
+    ['FREESTYLE-M', 'Any drink + flavor shot Medium', 3.60, 'Fountain drinks', 'Medium', 1, 1],
+    ['ESPRESSO', 'Espresso', 2.40, 'Coffee', null, 0, 0],
+    ['CAPPUCCINO', 'Cappuccino', 3.60, 'Coffee', null, 0, 0],
+    ['CROISSANT', 'Croissant', 2.20, 'Food', null, 0, 0],
+    ['TOASTIE', 'Ham & cheese toastie', 6.50, 'Food', null, 0, 0],
+    ['BROWNIE', 'Chocolate brownie', 3.20, 'Food', null, 0, 0],
 ];
-foreach ($menu as $i => [$ref, $name, $price, $catName]) {
+$hasSpire = Illuminate\Support\Facades\Schema::hasColumn('menus', 'spire_size');   // the extension's columns
+foreach ($menu as $i => [$ref, $name, $price, $catName, $size, $sugar, $flavors]) {
     $item = Menu::firstOrNew(['menu_name' => $name]);
     $made = !$item->exists;
     $item->menu_price = $price;
     $item->menu_status = 1;
     $item->menu_priority = $i;
     $item->minimum_qty = 1;
+    if ($hasSpire) {
+        $item->spire_size = $size;
+        $item->spire_sugar = (bool)$sugar;
+        $item->spire_flavors = (bool)$flavors;
+    }
     $item->save();
     $item->categories()->sync([$cats[$catName]]);
     $img = __DIR__.'/demo-img/'.$ref.'.png';

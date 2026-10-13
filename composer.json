@@ -1,0 +1,40 @@
+{
+    "name": "cepuder/ti-ext-fountaindrinks",
+    "type": "tastyigniter-package",
+    "description": "Fountain Drinks + QR: a QR code per fountain drink on paid orders, for use with Pepsi Spire controlled-pour dispensers.",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Cepuder Group Ltd",
+            "email": "info@cepuder.com",
+            "homepage": "https://cepuder.com"
+        }
+    ],
+    "keywords": ["tastyigniter", "fountain drinks", "qr code", "self-service", "dispenser", "pepsi", "spire"],
+    "require": {
+        "php": "^8.3",
+        "ext-openssl": "*",
+        "tastyigniter/core": "^v4.4",
+        "tastyigniter/ti-ext-cart": "^v4.0",
+        "chillerlan/php-qrcode": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cepuder\\FountainDrinks\\": "src/"
+        }
+    },
+    "extra": {
+        "tastyigniter-extension": {
+            "code": "cepuder.fountaindrinks",
+            "name": "Fountain Drinks + QR",
+            "icon": {
+                "class": "fa fa-qrcode",
+                "color": "#FFF",
+                "backgroundColor": "#2f7de1"
+            },
+            "homepage": "https://cepuder.com"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
