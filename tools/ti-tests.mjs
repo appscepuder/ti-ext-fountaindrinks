@@ -4,7 +4,8 @@
 //   order <items> <out-prefix>      storefront, phone size: guest order, "Pay at the counter";
 //                                   items like "Pepsi Max Medium*2,Pepsi Large,Croissant". Prints the order page URL.
 //   page <url> <out.png>            storefront, phone size: screenshot (e.g. the order page after completing it)
-//   listing <url> <out.png>         same, with every drink QR swapped for random data (for store listings)
+//   admintab <path> <tab> <out.png> admin: open a form tab (e.g. orders/edit/1 "Drink codes"), QRs swapped, 1280x900
+//   listing <url> <out.png>        same, with every drink QR swapped for random data (for store listings)
 // Needs TI_PASS (admin password) for the admin modes. Screenshots go where you say.
 import { spawn, execSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
@@ -41,6 +42,13 @@ const adminLogin = async () => {
   }
   console.log('admin:', (await text()).slice(0, 80));
 };
+// Listing screenshots never show real codes: swap every QR for random data (qrencode SVGs)
+const swapQrs = async selector => {
+  const fakes = Array.from({ length: 8 }, () => execSync(`qrencode -t SVG -m 0 -o - ${randomBytes(48).toString('base64')}`).toString().replace(/^<\?xml[^>]*>/, ''));
+  console.log('swapped', await js(`(() => { const f = ${JSON.stringify(fakes)}; const s = [...document.querySelectorAll(${JSON.stringify(selector)})].filter(e => e.querySelector('rect, path'));
+    s.forEach((e, i) => { e.outerHTML = f[i].replace('<svg', '<svg style="width:100%;height:auto"'); }); return s.length; })()`));
+  await sleep(300);
+};
 
 await send('Page.enable'); await send('DOM.enable');
 
@@ -52,10 +60,17 @@ if (mode === 'licence') {
   await send('DOM.setFileInputFiles', { nodeId: input.result.nodeId, files: [resolve(args[0])] });
   await js(`document.querySelector('input[name=licence_file]').form.submit(); 1`); await sleep(4000);
   console.log((await text()).slice(0, 400));
-} else if (mode === 'admin') {
+} else if (mode === 'admin' || mode === 'admintab') {
+  // admintab <path> <tab label> <out.png>: open a form tab first, QRs swapped for random data
   await adminLogin();
   await go(`${B}/admin/${args[0]}`);
-  await shot(args[1]);
+  if (mode === 'admintab') {
+    console.log('tab', await js(`(() => { const t = [...document.querySelectorAll("a[data-bs-toggle=tab], .nav-tabs a, a[role=tab], button[role=tab]")].find(a => a.innerText.trim() === ${JSON.stringify(args[1])}); t?.click(); if (t && window.bootstrap) bootstrap.Tab.getOrCreateInstance(t).show(); return t ? t.outerHTML.slice(0, 120) : false; })()`));
+    await sleep(800);
+    await swapQrs('.tab-pane.active svg');
+    args.splice(1, 1);
+  }
+  await shot(args[1], mode === 'admin');
 } else if (mode === 'order') {
   await size(390, 844);
   await go(`${B}/default/menus`, 4000);
@@ -93,13 +108,7 @@ if (mode === 'licence') {
 } else if (mode === 'page' || mode === 'listing') {
   await size(390, 844);
   await go(args[0], 5000);
-  if (mode === 'listing') {
-    // Listing screenshots never show real codes: swap every QR for random data (qrencode SVGs)
-    const fakes = Array.from({ length: 8 }, () => execSync(`qrencode -t SVG -m 0 -o - ${randomBytes(48).toString('base64')}`).toString().replace(/^<\?xml[^>]*>/, ''));
-    console.log('swapped', await js(`(() => { const f = ${JSON.stringify(fakes)}; const s = [...document.querySelectorAll('#cepuder-drink-codes svg')];
-      s.forEach((e, i) => { e.outerHTML = f[i].replace('<svg', '<svg style="width:100%;height:auto"'); }); return s.length; })()`));
-    await sleep(300);
-  }
+  if (mode === 'listing') await swapQrs('#cepuder-drink-codes svg');
   await shot(args[1]);
 }
 chrome.kill(); process.exit(0);
