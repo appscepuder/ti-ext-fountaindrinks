@@ -2,7 +2,7 @@
     "name": "cepuder/ti-ext-fountaindrinks",
     "type": "tastyigniter-package",
     "description": "Fountain Drinks + QR: a QR code per fountain drink on paid orders, for use with Pepsi Spire controlled-pour dispensers.",
-    "license": "proprietary",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Cepuder Group Ltd",

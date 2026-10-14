@@ -2,6 +2,8 @@
 
 Fountain Drinks + QR for TastyIgniter (online ordering): a Spire code per fountain drink on paid orders, shown on the customer's phone. Work in progress.
 
+Licence: GPL v3 or later (`LICENSE`), like the Dolibarr module. The secret is the store's Spire licence file, uploaded in the admin, never the code.
+
 - The extension is the repo root (`composer.json`, `src/`, `resources/`, `database/`, `routes/`). On Kundera it is installed from `/data/tastyigniter/ext/ti-ext-fountaindrinks` through a Composer path repository (`composer require cepuder/ti-ext-fountaindrinks:@dev`), then `php artisan igniter:up`.
 - `tools/ti-tests.mjs`: drives the demo in headless Chrome (licence upload, a guest order, screenshots).
 
