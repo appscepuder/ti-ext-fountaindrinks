@@ -4,8 +4,10 @@
 //   order <items> <out-prefix>      storefront, phone size: guest order, "Pay at the counter";
 //                                   items like "Pepsi Max Medium*2,Pepsi Large,Croissant". Prints the order page URL.
 //   page <url> <out.png>            storefront, phone size: screenshot (e.g. the order page after completing it)
+//   listing <url> <out.png>         same, with every drink QR swapped for random data (for store listings)
 // Needs TI_PASS (admin password) for the admin modes. Screenshots go where you say.
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -88,9 +90,16 @@ if (mode === 'licence') {
   console.log('order page:', await js('location.href'));
   await size(390, 844);
   await shot(`${args[1]}-success.png`);
-} else if (mode === 'page') {
+} else if (mode === 'page' || mode === 'listing') {
   await size(390, 844);
   await go(args[0], 5000);
+  if (mode === 'listing') {
+    // Listing screenshots never show real codes: swap every QR for random data (qrencode SVGs)
+    const fakes = Array.from({ length: 8 }, () => execSync(`qrencode -t SVG -m 0 -o - ${randomBytes(48).toString('base64')}`).toString().replace(/^<\?xml[^>]*>/, ''));
+    console.log('swapped', await js(`(() => { const f = ${JSON.stringify(fakes)}; const s = [...document.querySelectorAll('#cepuder-drink-codes svg')];
+      s.forEach((e, i) => { e.outerHTML = f[i].replace('<svg', '<svg style="width:100%;height:auto"'); }); return s.length; })()`));
+    await sleep(300);
+  }
   await shot(args[1]);
 }
 chrome.kill(); process.exit(0);
